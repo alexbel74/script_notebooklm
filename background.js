@@ -339,9 +339,15 @@ const YouTubePlaylistParser = {
         }
       }
       
-      // Limit to 100 videos (configurable for paid users)
-      const limit = 100;
-      return videos.slice(0, limit);
+      console.log(`Found ${videos.length} videos from playlist`);
+      
+      if (videos.length === 0) {
+        throw new Error('No videos found in playlist');
+      }
+      
+      // Import ALL videos (no limit for paid users)
+      // If you want to limit, change this value or add to settings
+      return videos;
       
     } catch (error) {
       console.error('getPlaylistVideos error:', error);
@@ -442,9 +448,9 @@ const YouTubePlaylistParser = {
         throw new Error('No videos found on channel');
       }
       
-      // Limit to 100 videos (configurable for paid users)
-      const limit = 100;
-      return videos.slice(0, limit);
+      // Import ALL videos (no limit for paid users)
+      // If you want to limit, change this value or add to settings
+      return videos;
       
     } catch (error) {
       console.error('getChannelVideos error:', error);

@@ -105,10 +105,10 @@ function detectYouTubePage() {
   
   if (isPlaylist) {
     addBtnText.textContent = '📋 Import Playlist';
-    addBtn.title = 'Import all videos from this playlist (up to 100)';
+    addBtn.title = 'Import all videos from this playlist (no limit)';
   } else if (isChannel) {
     addBtnText.textContent = '📺 Import Channel';
-    addBtn.title = 'Import recent videos from this channel (up to 100)';
+    addBtn.title = 'Import all available videos from this channel';
   } else if (isVideo) {
     addBtnText.textContent = '🎬 Add Video';
     addBtn.title = 'Add this YouTube video';
