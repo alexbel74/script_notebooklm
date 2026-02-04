@@ -299,6 +299,57 @@ const NotebookLMAPI = {
 };
 
 // ============================================
+// YouTube Playlist Parser
+// ============================================
+const YouTubePlaylistParser = {
+  async getPlaylistVideos(playlistUrl) {
+    try {
+      const url = new URL(playlistUrl);
+      const listId = url.searchParams.get('list');
+      
+      if (!listId) {
+        throw new Error('Invalid playlist URL');
+      }
+      
+      // Fetch playlist page
+      const response = await fetch(`https://www.youtube.com/playlist?list=${listId}`);
+      const html = await response.text();
+      
+      // Extract video IDs from ytInitialData
+      const match = html.match(/var ytInitialData = ({.*?});/);
+      if (!match) {
+        throw new Error('Could not parse playlist data');
+      }
+      
+      const data = JSON.parse(match[1]);
+      const videos = [];
+      
+      // Navigate to playlist contents
+      const contents = data?.contents?.twoColumnBrowseResultsRenderer?.tabs?.[0]
+        ?.tabRenderer?.content?.sectionListRenderer?.contents?.[0]
+        ?.itemSectionRenderer?.contents?.[0]
+        ?.playlistVideoListRenderer?.contents || [];
+      
+      for (const item of contents) {
+        if (item.playlistVideoRenderer) {
+          const videoId = item.playlistVideoRenderer.videoId;
+          if (videoId) {
+            videos.push(`https://www.youtube.com/watch?v=${videoId}`);
+          }
+        }
+      }
+      
+      // Limit to 50 videos
+      return videos.slice(0, 50);
+      
+    } catch (error) {
+      console.error('getPlaylistVideos error:', error);
+      throw error;
+    }
+  }
+};
+
+// ============================================
 // YouTube Comments Parser
 // ============================================
 const YouTubeCommentsAPI = {
@@ -593,6 +644,19 @@ async function handleMessage(request, sender) {
     case 'add-source':
       await NotebookLMAPI.addSource(params.notebookId, params.url);
       return { success: true };
+
+    case 'import-playlist':
+      const playlistVideos = await YouTubePlaylistParser.getPlaylistVideos(params.url);
+      if (playlistVideos.length === 0) {
+        return { error: 'No videos found in playlist' };
+      }
+      await NotebookLMAPI.addSources(params.notebookId, playlistVideos);
+      await NotebookLMAPI.waitForSources(params.notebookId);
+      return { 
+        success: true, 
+        count: playlistVideos.length,
+        notebookUrl: NotebookLMAPI.getNotebookUrl(params.notebookId, currentAuthuser) 
+      };
 
     case 'add-sources':
       await NotebookLMAPI.addSources(params.notebookId, params.urls);

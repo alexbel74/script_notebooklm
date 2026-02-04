@@ -146,28 +146,61 @@ function setupEventListeners() {
 async function handleAddToNotebook() {
   if (!state.selectedNotebook || !state.currentTab) return;
   
-  showLoadingState('Adding to notebook...');
+  const url = state.currentTab.url;
+  const isPlaylist = url.includes('youtube.com/playlist?list=');
+  const isChannel = url.includes('youtube.com/@') || url.includes('youtube.com/channel/') || url.includes('youtube.com/c/');
   
-  try {
-    const response = await sendMessage({
-      cmd: 'add-source',
-      notebookId: state.selectedNotebook.id,
-      url: state.currentTab.url
-    });
+  if (isPlaylist) {
+    // Import playlist
+    showLoadingState('Fetching playlist videos...');
     
-    if (response.error) {
-      showErrorState(response.error);
-      return;
+    try {
+      const response = await sendMessage({
+        cmd: 'import-playlist',
+        notebookId: state.selectedNotebook.id,
+        url: state.currentTab.url
+      });
+      
+      if (response.error) {
+        showErrorState(response.error);
+        return;
+      }
+      
+      showSuccessState(`Added ${response.count} videos!`);
+      
+      setTimeout(() => {
+        hideAllStates();
+      }, 3000);
+      
+    } catch (error) {
+      showErrorState(error.message || 'Failed to import playlist');
     }
     
-    showSuccessState();
+  } else {
+    // Add single page/video
+    showLoadingState('Adding to notebook...');
     
-    setTimeout(() => {
-      hideAllStates();
-    }, 3000);
-    
-  } catch (error) {
-    showErrorState(error.message || 'Failed to add to notebook');
+    try {
+      const response = await sendMessage({
+        cmd: 'add-source',
+        notebookId: state.selectedNotebook.id,
+        url: state.currentTab.url
+      });
+      
+      if (response.error) {
+        showErrorState(response.error);
+        return;
+      }
+      
+      showSuccessState();
+      
+      setTimeout(() => {
+        hideAllStates();
+      }, 3000);
+      
+    } catch (error) {
+      showErrorState(error.message || 'Failed to add to notebook');
+    }
   }
 }
 
@@ -186,11 +219,16 @@ function showLoadingState(message) {
   document.getElementById('loading-text').textContent = message;
 }
 
-function showSuccessState() {
+function showSuccessState(message = 'Added successfully!') {
   document.getElementById('add-btn').classList.add('hidden');
   document.getElementById('loading-state').classList.add('hidden');
   document.getElementById('success-state').classList.remove('hidden');
   document.getElementById('error-state').classList.add('hidden');
+  
+  const successText = document.querySelector('.success-text');
+  if (successText) {
+    successText.textContent = message;
+  }
 }
 
 function showErrorState(message) {
