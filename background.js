@@ -304,30 +304,57 @@ const NotebookLMAPI = {
 const YouTubeCommentsAPI = {
   async getVideoMetadataFromDOM(tabId) {
     try {
-      const results = await browserAPI.scripting.executeScript({
-        target: { tabId },
-        func: () => {
-          const title = document.querySelector('h1.ytd-video-primary-info-renderer')?.textContent?.trim() 
-            || document.querySelector('yt-formatted-string.ytd-video-primary-info-renderer')?.textContent?.trim()
-            || document.title.replace(' - YouTube', '');
-          
-          const countEl = document.querySelector('#count .count-text, #comments #count');
-          let commentCount = 0;
-          if (countEl) {
-            const match = countEl.textContent.match(/[\d,]+/);
-            if (match) {
-              commentCount = parseInt(match[0].replace(/,/g, ''), 10);
+      // Use tabs.executeScript for Firefox compatibility (MV2)
+      if (browserAPI.scripting) {
+        // Chrome MV3
+        const results = await browserAPI.scripting.executeScript({
+          target: { tabId },
+          func: () => {
+            const title = document.querySelector('h1.ytd-video-primary-info-renderer')?.textContent?.trim() 
+              || document.querySelector('yt-formatted-string.ytd-video-primary-info-renderer')?.textContent?.trim()
+              || document.title.replace(' - YouTube', '');
+            
+            const countEl = document.querySelector('#count .count-text, #comments #count');
+            let commentCount = 0;
+            if (countEl) {
+              const match = countEl.textContent.match(/[\d,]+/);
+              if (match) {
+                commentCount = parseInt(match[0].replace(/,/g, ''), 10);
+              }
             }
+            
+            const channelEl = document.querySelector('#channel-name a, ytd-channel-name a');
+            const channel = channelEl?.textContent?.trim() || '';
+            
+            return { title, commentCount, channel };
           }
-          
-          const channelEl = document.querySelector('#channel-name a, ytd-channel-name a');
-          const channel = channelEl?.textContent?.trim() || '';
-          
-          return { title, commentCount, channel };
-        }
-      });
-      
-      return results[0]?.result || { title: '', commentCount: 0, channel: '' };
+        });
+        return results[0]?.result || { title: '', commentCount: 0, channel: '' };
+      } else {
+        // Firefox MV2
+        const results = await browserAPI.tabs.executeScript(tabId, {
+          code: `(function() {
+            const title = document.querySelector('h1.ytd-video-primary-info-renderer')?.textContent?.trim() 
+              || document.querySelector('yt-formatted-string.ytd-video-primary-info-renderer')?.textContent?.trim()
+              || document.title.replace(' - YouTube', '');
+            
+            const countEl = document.querySelector('#count .count-text, #comments #count');
+            let commentCount = 0;
+            if (countEl) {
+              const match = countEl.textContent.match(/[\\d,]+/);
+              if (match) {
+                commentCount = parseInt(match[0].replace(/,/g, ''), 10);
+              }
+            }
+            
+            const channelEl = document.querySelector('#channel-name a, ytd-channel-name a');
+            const channel = channelEl?.textContent?.trim() || '';
+            
+            return { title, commentCount, channel };
+          })();`
+        });
+        return results[0] || { title: '', commentCount: 0, channel: '' };
+      }
     } catch (error) {
       console.error('getVideoMetadataFromDOM error:', error);
       return { title: '', commentCount: 0, channel: '' };

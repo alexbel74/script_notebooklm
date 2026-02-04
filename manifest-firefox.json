@@ -17,7 +17,7 @@
   ],
 
   "background": {
-    "scripts": ["lib/browser-polyfill.js", "background.js"],
+    "scripts": ["background.js"],
     "persistent": false
   },
 
@@ -42,7 +42,7 @@
   "content_scripts": [
     {
       "matches": ["https://notebooklm.google.com/*"],
-      "js": ["lib/browser-polyfill.js", "content/notebooklm.js"],
+      "js": ["content/notebooklm.js"],
       "css": ["content/notebooklm.css"],
       "run_at": "document_idle"
     }
