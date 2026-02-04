@@ -1,4 +1,4 @@
-// Background Service Worker for NotebookLM Importer
+// Background Script for NotebookLM Importer
 // Compatible with Chrome (MV3) and Firefox (MV2)
 
 // ============================================

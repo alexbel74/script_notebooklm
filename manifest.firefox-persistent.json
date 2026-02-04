@@ -2,8 +2,8 @@
   "manifest_version": 2,
   "name": "NotebookLM Importer",
   "short_name": "NLM Importer",
-  "version": "2.0.1",
-  "description": "Import web pages and YouTube videos to Google NotebookLM with modern UI",
+  "version": "2.0.2",
+  "description": "Import web pages and YouTube videos to Google NotebookLM",
   "default_locale": "en",
 
   "permissions": [
@@ -18,7 +18,7 @@
 
   "background": {
     "scripts": ["background.js"],
-    "persistent": false
+    "persistent": true
   },
 
   "browser_action": {
@@ -65,7 +65,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "notebooklm-importer@alexbel74.github.io",
-      "strict_min_version": "91.0"
+      "strict_min_version": "78.0"
     }
   }
 }
