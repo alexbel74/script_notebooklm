@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NotebookLM Importer</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="aurora-bg">
+    <div class="aurora-blob aurora-1"></div>
+    <div class="aurora-blob aurora-2"></div>
+    <div class="aurora-blob aurora-3"></div>
+  </div>
+
+  <div class="status-bar" id="status-bar">
+    <div class="status-indicator" id="status-indicator"></div>
+    <span class="status-text" id="status-text">Connecting...</span>
+  </div>
+
+  <div class="container">
+    <header class="header">
+      <div class="logo">
+        <svg class="logo-icon" viewBox="0 0 32 32" fill="none">
+          <rect x="4" y="4" width="24" height="24" rx="6" fill="url(#logo-gradient)"/>
+          <path d="M10 12h12M10 16h12M10 20h8" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="logo-gradient" x1="4" y1="4" x2="28" y2="28">
+              <stop stop-color="#8b5cf6"/>
+              <stop offset="1" stop-color="#06b6d4"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="logo-text">NotebookLM</span>
+      </div>
+    </header>
+
+    <div class="card current-page-card" id="current-page-card">
+      <div class="card-glow"></div>
+      <div class="page-info">
+        <div class="page-title" id="page-title">Loading page...</div>
+        <div class="page-url" id="page-url">—</div>
+      </div>
+    </div>
+
+    <div class="notebook-section">
+      <label class="section-label">Select Notebook</label>
+      <select class="select-input" id="notebook-select">
+        <option value="">Loading...</option>
+      </select>
+    </div>
+
+    <button class="btn-primary" id="add-btn" disabled>
+      <span>Add to Notebook</span>
+    </button>
+
+    <div class="loading-state hidden" id="loading-state">
+      <div class="shimmer-container">
+        <div class="shimmer"></div>
+      </div>
+      <span id="loading-text">Adding...</span>
+    </div>
+
+    <div class="success-state hidden" id="success-state">
+      <div class="success-icon">✓</div>
+      <span class="success-text">Added successfully!</span>
+    </div>
+
+    <div class="error-state hidden" id="error-state">
+      <div class="error-icon">✗</div>
+      <span class="error-text" id="error-text">Error</span>
+    </div>
+  </div>
+
+  <script src="../lib/browser-polyfill.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
