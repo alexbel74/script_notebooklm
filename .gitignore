@@ -1,0 +1,30 @@
+# Build artifacts
+build/
+*.zip
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary
+.tmp/
+temp/
+
+# Node (if used)
+node_modules/
+package-lock.json
+
+# Private keys
+*.pem
+*.key
