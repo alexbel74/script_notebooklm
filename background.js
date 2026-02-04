@@ -339,8 +339,9 @@ const YouTubePlaylistParser = {
         }
       }
       
-      // Limit to 50 videos
-      return videos.slice(0, 50);
+      // Limit to 100 videos (configurable for paid users)
+      const limit = 100;
+      return videos.slice(0, limit);
       
     } catch (error) {
       console.error('getPlaylistVideos error:', error);
@@ -401,8 +402,9 @@ const YouTubePlaylistParser = {
         if (videos.length > 0) break; // Found videos, stop searching
       }
       
-      // Limit to 50 videos
-      return videos.slice(0, 50);
+      // Limit to 100 videos (configurable for paid users)
+      const limit = 100;
+      return videos.slice(0, limit);
       
     } catch (error) {
       console.error('getChannelVideos error:', error);

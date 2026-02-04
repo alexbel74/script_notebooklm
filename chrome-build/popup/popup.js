@@ -93,7 +93,11 @@ function detectYouTubePage() {
   const url = state.currentTab.url;
   const isPlaylist = url.includes('youtube.com/playlist?list=');
   const isVideo = url.includes('youtube.com/watch?v=');
-  const isChannel = url.includes('youtube.com/@') || url.includes('youtube.com/channel/') || url.includes('youtube.com/c/') || url.includes('youtube.com/user/');
+  const isChannel = url.includes('youtube.com/@') || 
+                    url.includes('youtube.com/channel/') || 
+                    url.includes('youtube.com/c/') || 
+                    url.includes('youtube.com/user/') ||
+                    /youtube\.com\/[^\/\?]+$/.test(url); // Matches youtube.com/username
   
   // Показать/скрыть YouTube-специфичные кнопки
   const addBtn = document.getElementById('add-btn');
@@ -101,10 +105,10 @@ function detectYouTubePage() {
   
   if (isPlaylist) {
     addBtnText.textContent = '📋 Import Playlist';
-    addBtn.title = 'Import all videos from this playlist (up to 50)';
+    addBtn.title = 'Import all videos from this playlist (up to 100)';
   } else if (isChannel) {
     addBtnText.textContent = '📺 Import Channel';
-    addBtn.title = 'Import recent videos from this channel (up to 50)';
+    addBtn.title = 'Import recent videos from this channel (up to 100)';
   } else if (isVideo) {
     addBtnText.textContent = '🎬 Add Video';
     addBtn.title = 'Add this YouTube video';
