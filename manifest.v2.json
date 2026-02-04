@@ -1,0 +1,70 @@
+{
+  "manifest_version": 2,
+  "name": "NotebookLM Importer",
+  "short_name": "NLM Importer",
+  "version": "2.0.1",
+  "description": "Import web pages and YouTube videos to Google NotebookLM with modern UI",
+  "default_locale": "en",
+
+  "permissions": [
+    "tabs",
+    "storage",
+    "activeTab",
+    "contextMenus",
+    "https://notebooklm.google.com/*",
+    "https://www.youtube.com/*",
+    "https://accounts.google.com/*"
+  ],
+
+  "background": {
+    "scripts": ["background.js"]
+  },
+
+  "browser_action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "NotebookLM Importer",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://notebooklm.google.com/*"],
+      "js": ["content/notebooklm.js"],
+      "css": ["content/notebooklm.css"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "commands": {
+    "_execute_browser_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+N",
+        "mac": "Command+Shift+N"
+      },
+      "description": "Quick add to NotebookLM"
+    }
+  },
+
+  "web_accessible_resources": [
+    "icons/*"
+  ],
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "notebooklm-importer@alexbel74.github.io",
+      "strict_min_version": "91.0"
+    }
+  }
+}
