@@ -71,13 +71,46 @@ function setConnectionStatus(status, message) {
 function updatePageUI() {
   if (!state.currentTab) return;
   
-  document.getElementById('page-title').textContent = state.currentTab.title || 'Untitled';
+  const title = state.currentTab.title || 'Untitled';
+  document.getElementById('page-title').textContent = title;
+  document.getElementById('page-title').title = title; // Tooltip для полного текста
   
   try {
     const url = new URL(state.currentTab.url);
     document.getElementById('page-url').textContent = url.hostname;
+    document.getElementById('page-url').title = state.currentTab.url; // Tooltip
   } catch {
     document.getElementById('page-url').textContent = state.currentTab.url;
+  }
+  
+  // Определение типа страницы YouTube
+  detectYouTubePage();
+}
+
+function detectYouTubePage() {
+  if (!state.currentTab) return;
+  
+  const url = state.currentTab.url;
+  const isPlaylist = url.includes('youtube.com/playlist?list=');
+  const isVideo = url.includes('youtube.com/watch?v=');
+  const isChannel = url.includes('youtube.com/@') || url.includes('youtube.com/channel/') || url.includes('youtube.com/c/');
+  
+  // Показать/скрыть YouTube-специфичные кнопки
+  const addBtn = document.getElementById('add-btn');
+  const addBtnText = addBtn.querySelector('.btn-text');
+  
+  if (isPlaylist) {
+    addBtnText.textContent = '📋 Import Playlist';
+    addBtn.title = 'Import all videos from this playlist';
+  } else if (isVideo) {
+    addBtnText.textContent = '🎬 Add Video';
+    addBtn.title = 'Add this YouTube video';
+  } else if (isChannel) {
+    addBtnText.textContent = '📺 Import Channel';
+    addBtn.title = 'Import videos from this channel';
+  } else {
+    addBtnText.textContent = 'Add to Notebook';
+    addBtn.title = 'Add this page to notebook';
   }
 }
 
