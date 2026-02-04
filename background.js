@@ -346,6 +346,68 @@ const YouTubePlaylistParser = {
       console.error('getPlaylistVideos error:', error);
       throw error;
     }
+  },
+
+  async getChannelVideos(channelUrl) {
+    try {
+      // Normalize channel URL to /videos page
+      let fetchUrl = channelUrl;
+      if (!channelUrl.includes('/videos')) {
+        fetchUrl = channelUrl.replace(/\/$/, '') + '/videos';
+      }
+      
+      // Fetch channel videos page
+      const response = await fetch(fetchUrl);
+      const html = await response.text();
+      
+      // Extract video IDs from ytInitialData
+      const match = html.match(/var ytInitialData = ({.*?});/);
+      if (!match) {
+        throw new Error('Could not parse channel data');
+      }
+      
+      const data = JSON.parse(match[1]);
+      const videos = [];
+      
+      // Navigate to channel video contents
+      // Try different possible paths in YouTube's data structure
+      const tabs = data?.contents?.twoColumnBrowseResultsRenderer?.tabs || [];
+      
+      for (const tab of tabs) {
+        const contents = tab?.tabRenderer?.content?.richGridRenderer?.contents || 
+                        tab?.tabRenderer?.content?.sectionListRenderer?.contents || [];
+        
+        for (const item of contents) {
+          // Rich grid items (newer layout)
+          if (item.richItemRenderer?.content?.videoRenderer) {
+            const videoId = item.richItemRenderer.content.videoRenderer.videoId;
+            if (videoId) {
+              videos.push(`https://www.youtube.com/watch?v=${videoId}`);
+            }
+          }
+          // Section list items (older layout)
+          else if (item.itemSectionRenderer?.contents) {
+            for (const subItem of item.itemSectionRenderer.contents) {
+              if (subItem.gridVideoRenderer) {
+                const videoId = subItem.gridVideoRenderer.videoId;
+                if (videoId) {
+                  videos.push(`https://www.youtube.com/watch?v=${videoId}`);
+                }
+              }
+            }
+          }
+        }
+        
+        if (videos.length > 0) break; // Found videos, stop searching
+      }
+      
+      // Limit to 50 videos
+      return videos.slice(0, 50);
+      
+    } catch (error) {
+      console.error('getChannelVideos error:', error);
+      throw error;
+    }
   }
 };
 
@@ -655,6 +717,19 @@ async function handleMessage(request, sender) {
       return { 
         success: true, 
         count: playlistVideos.length,
+        notebookUrl: NotebookLMAPI.getNotebookUrl(params.notebookId, currentAuthuser) 
+      };
+
+    case 'import-channel':
+      const channelVideos = await YouTubePlaylistParser.getChannelVideos(params.url);
+      if (channelVideos.length === 0) {
+        return { error: 'No videos found on channel' };
+      }
+      await NotebookLMAPI.addSources(params.notebookId, channelVideos);
+      await NotebookLMAPI.waitForSources(params.notebookId);
+      return { 
+        success: true, 
+        count: channelVideos.length,
         notebookUrl: NotebookLMAPI.getNotebookUrl(params.notebookId, currentAuthuser) 
       };
 

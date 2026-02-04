@@ -93,7 +93,7 @@ function detectYouTubePage() {
   const url = state.currentTab.url;
   const isPlaylist = url.includes('youtube.com/playlist?list=');
   const isVideo = url.includes('youtube.com/watch?v=');
-  const isChannel = url.includes('youtube.com/@') || url.includes('youtube.com/channel/') || url.includes('youtube.com/c/');
+  const isChannel = url.includes('youtube.com/@') || url.includes('youtube.com/channel/') || url.includes('youtube.com/c/') || url.includes('youtube.com/user/');
   
   // Показать/скрыть YouTube-специфичные кнопки
   const addBtn = document.getElementById('add-btn');
@@ -101,13 +101,13 @@ function detectYouTubePage() {
   
   if (isPlaylist) {
     addBtnText.textContent = '📋 Import Playlist';
-    addBtn.title = 'Import all videos from this playlist';
+    addBtn.title = 'Import all videos from this playlist (up to 50)';
+  } else if (isChannel) {
+    addBtnText.textContent = '📺 Import Channel';
+    addBtn.title = 'Import recent videos from this channel (up to 50)';
   } else if (isVideo) {
     addBtnText.textContent = '🎬 Add Video';
     addBtn.title = 'Add this YouTube video';
-  } else if (isChannel) {
-    addBtnText.textContent = '📺 Import Channel';
-    addBtn.title = 'Import videos from this channel';
   } else {
     addBtnText.textContent = 'Add to Notebook';
     addBtn.title = 'Add this page to notebook';
@@ -148,7 +148,7 @@ async function handleAddToNotebook() {
   
   const url = state.currentTab.url;
   const isPlaylist = url.includes('youtube.com/playlist?list=');
-  const isChannel = url.includes('youtube.com/@') || url.includes('youtube.com/channel/') || url.includes('youtube.com/c/');
+  const isChannel = url.includes('youtube.com/@') || url.includes('youtube.com/channel/') || url.includes('youtube.com/c/') || url.includes('youtube.com/user/');
   
   if (isPlaylist) {
     // Import playlist
@@ -174,6 +174,32 @@ async function handleAddToNotebook() {
       
     } catch (error) {
       showErrorState(error.message || 'Failed to import playlist');
+    }
+    
+  } else if (isChannel) {
+    // Import channel
+    showLoadingState('Fetching channel videos...');
+    
+    try {
+      const response = await sendMessage({
+        cmd: 'import-channel',
+        notebookId: state.selectedNotebook.id,
+        url: state.currentTab.url
+      });
+      
+      if (response.error) {
+        showErrorState(response.error);
+        return;
+      }
+      
+      showSuccessState(`Added ${response.count} videos from channel!`);
+      
+      setTimeout(() => {
+        hideAllStates();
+      }, 3000);
+      
+    } catch (error) {
+      showErrorState(error.message || 'Failed to import channel');
     }
     
   } else {
