@@ -1,0 +1,191 @@
+{
+  "extName": {
+    "message": "NotebookLM Импортер"
+  },
+  "extDescription": {
+    "message": "Красивый способ импортировать YouTube видео и веб-страницы в Google NotebookLM"
+  },
+  "cmdQuickAdd": {
+    "message": "Быстро добавить текущую страницу"
+  },
+  "selectNotebook": {
+    "message": "Выберите блокнот"
+  },
+  "createNew": {
+    "message": "Создать новый блокнот"
+  },
+  "addToNotebook": {
+    "message": "Добавить в блокнот"
+  },
+  "createNotebook": {
+    "message": "Создать блокнот"
+  },
+  "cancel": {
+    "message": "Отмена"
+  },
+  "create": {
+    "message": "Создать"
+  },
+  "connecting": {
+    "message": "Подключение..."
+  },
+  "connected": {
+    "message": "Подключено"
+  },
+  "notConnected": {
+    "message": "Не подключено"
+  },
+  "loginRequired": {
+    "message": "Сначала войдите в NotebookLM"
+  },
+  "addingToNotebook": {
+    "message": "Добавление в блокнот..."
+  },
+  "extractingVideos": {
+    "message": "Извлечение видео..."
+  },
+  "addedSuccessfully": {
+    "message": "Успешно добавлено!"
+  },
+  "openNotebook": {
+    "message": "Открыть блокнот"
+  },
+  "somethingWentWrong": {
+    "message": "Что-то пошло не так"
+  },
+  "tryAgain": {
+    "message": "Попробовать снова"
+  },
+  "sources": {
+    "message": "источников"
+  },
+  "searchNotebooks": {
+    "message": "Поиск блокнотов..."
+  },
+  "noNotebooks": {
+    "message": "Блокноты не найдены"
+  },
+  "youtube": {
+    "message": "YouTube"
+  },
+  "tabs": {
+    "message": "Вкладки"
+  },
+  "bulk": {
+    "message": "Массово"
+  },
+  "history": {
+    "message": "История"
+  },
+  "settings": {
+    "message": "Настройки"
+  },
+  "youtubeVideo": {
+    "message": "YouTube Видео"
+  },
+  "youtubePlaylist": {
+    "message": "YouTube Плейлист"
+  },
+  "youtubeChannel": {
+    "message": "YouTube Канал"
+  },
+  "parseComments": {
+    "message": "Парсить комментарии"
+  },
+  "loadingComments": {
+    "message": "Загрузка комментариев..."
+  },
+  "cancelParsing": {
+    "message": "Отмена"
+  },
+  "commentsAdded": {
+    "message": "комментариев добавлено"
+  },
+  "deleteSelected": {
+    "message": "Удалить выбранные"
+  },
+  "confirmDelete": {
+    "message": "Удалить $COUNT$ источник(ов)? Это действие нельзя отменить."
+  },
+  "deleting": {
+    "message": "Удаление..."
+  },
+  "deleted": {
+    "message": "Удалено"
+  },
+  "bulkImport": {
+    "message": "Массовый импорт"
+  },
+  "bulkImportDesc": {
+    "message": "Вставьте несколько URL для одновременного импорта"
+  },
+  "pasteUrls": {
+    "message": "Вставьте URL (по одному на строку)"
+  },
+  "importAll": {
+    "message": "Импортировать всё"
+  },
+  "fromTabs": {
+    "message": "Из вкладок"
+  },
+  "fromTabsDesc": {
+    "message": "Выберите открытые вкладки браузера для импорта"
+  },
+  "selectAll": {
+    "message": "Выбрать всё"
+  },
+  "importSelected": {
+    "message": "Импортировать выбранное"
+  },
+  "youtubeOptions": {
+    "message": "Опции YouTube"
+  },
+  "youtubeOptionsDesc": {
+    "message": "Настройте параметры импорта YouTube"
+  },
+  "commentsSettings": {
+    "message": "Настройки парсинга комментариев"
+  },
+  "commentsMode": {
+    "message": "Режим"
+  },
+  "commentsLimit": {
+    "message": "Макс. комментариев"
+  },
+  "includeReplies": {
+    "message": "Включить ответы"
+  },
+  "historyDesc": {
+    "message": "Недавние импорты"
+  },
+  "noHistory": {
+    "message": "История импорта пока пуста"
+  },
+  "settingsDesc": {
+    "message": "Настройте параметры расширения"
+  },
+  "appearance": {
+    "message": "Внешний вид"
+  },
+  "theme": {
+    "message": "Тема"
+  },
+  "language": {
+    "message": "Язык"
+  },
+  "features": {
+    "message": "Функции"
+  },
+  "enableBulkDelete": {
+    "message": "Включить массовое удаление в NotebookLM"
+  },
+  "about": {
+    "message": "О расширении"
+  },
+  "selectAccount": {
+    "message": "Выберите аккаунт"
+  },
+  "notebookName": {
+    "message": "Название блокнота..."
+  }
+}

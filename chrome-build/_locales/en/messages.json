@@ -1,0 +1,191 @@
+{
+  "extName": {
+    "message": "NotebookLM Importer"
+  },
+  "extDescription": {
+    "message": "Beautiful way to import YouTube videos and web pages into Google NotebookLM"
+  },
+  "cmdQuickAdd": {
+    "message": "Quick add current page"
+  },
+  "selectNotebook": {
+    "message": "Select Notebook"
+  },
+  "createNew": {
+    "message": "Create new notebook"
+  },
+  "addToNotebook": {
+    "message": "Add to Notebook"
+  },
+  "createNotebook": {
+    "message": "Create Notebook"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "create": {
+    "message": "Create"
+  },
+  "connecting": {
+    "message": "Connecting..."
+  },
+  "connected": {
+    "message": "Connected"
+  },
+  "notConnected": {
+    "message": "Not connected"
+  },
+  "loginRequired": {
+    "message": "Please login to NotebookLM first"
+  },
+  "addingToNotebook": {
+    "message": "Adding to notebook..."
+  },
+  "extractingVideos": {
+    "message": "Extracting videos..."
+  },
+  "addedSuccessfully": {
+    "message": "Added successfully!"
+  },
+  "openNotebook": {
+    "message": "Open Notebook"
+  },
+  "somethingWentWrong": {
+    "message": "Something went wrong"
+  },
+  "tryAgain": {
+    "message": "Try again"
+  },
+  "sources": {
+    "message": "sources"
+  },
+  "searchNotebooks": {
+    "message": "Search notebooks..."
+  },
+  "noNotebooks": {
+    "message": "No notebooks found"
+  },
+  "youtube": {
+    "message": "YouTube"
+  },
+  "tabs": {
+    "message": "Tabs"
+  },
+  "bulk": {
+    "message": "Bulk"
+  },
+  "history": {
+    "message": "History"
+  },
+  "settings": {
+    "message": "Settings"
+  },
+  "youtubeVideo": {
+    "message": "YouTube Video"
+  },
+  "youtubePlaylist": {
+    "message": "YouTube Playlist"
+  },
+  "youtubeChannel": {
+    "message": "YouTube Channel"
+  },
+  "parseComments": {
+    "message": "Parse Comments"
+  },
+  "loadingComments": {
+    "message": "Loading comments..."
+  },
+  "cancelParsing": {
+    "message": "Cancel"
+  },
+  "commentsAdded": {
+    "message": "comments added"
+  },
+  "deleteSelected": {
+    "message": "Delete Selected"
+  },
+  "confirmDelete": {
+    "message": "Delete $COUNT$ source(s)? This cannot be undone."
+  },
+  "deleting": {
+    "message": "Deleting..."
+  },
+  "deleted": {
+    "message": "Deleted"
+  },
+  "bulkImport": {
+    "message": "Bulk Import"
+  },
+  "bulkImportDesc": {
+    "message": "Paste multiple URLs to import them all at once"
+  },
+  "pasteUrls": {
+    "message": "Paste URLs (one per line)"
+  },
+  "importAll": {
+    "message": "Import All"
+  },
+  "fromTabs": {
+    "message": "Import from Tabs"
+  },
+  "fromTabsDesc": {
+    "message": "Select open browser tabs to import"
+  },
+  "selectAll": {
+    "message": "Select All"
+  },
+  "importSelected": {
+    "message": "Import Selected"
+  },
+  "youtubeOptions": {
+    "message": "YouTube Options"
+  },
+  "youtubeOptionsDesc": {
+    "message": "Configure YouTube import settings"
+  },
+  "commentsSettings": {
+    "message": "Comments Parsing Settings"
+  },
+  "commentsMode": {
+    "message": "Mode"
+  },
+  "commentsLimit": {
+    "message": "Max Comments"
+  },
+  "includeReplies": {
+    "message": "Include Replies"
+  },
+  "historyDesc": {
+    "message": "Recent imports"
+  },
+  "noHistory": {
+    "message": "No import history yet"
+  },
+  "settingsDesc": {
+    "message": "Configure extension preferences"
+  },
+  "appearance": {
+    "message": "Appearance"
+  },
+  "theme": {
+    "message": "Theme"
+  },
+  "language": {
+    "message": "Language"
+  },
+  "features": {
+    "message": "Features"
+  },
+  "enableBulkDelete": {
+    "message": "Enable Bulk Delete in NotebookLM"
+  },
+  "about": {
+    "message": "About"
+  },
+  "selectAccount": {
+    "message": "Select Account"
+  },
+  "notebookName": {
+    "message": "Notebook name..."
+  }
+}
