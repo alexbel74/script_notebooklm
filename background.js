@@ -355,8 +355,10 @@ const YouTubePlaylistParser = {
     }
   },
 
-  async getChannelVideos(channelUrl) {
+  async getChannelVideos(channelUrl, options = {}) {
     try {
+      const { maxVideos = 1000, enableContinuation = true } = options;
+      
       // Normalize channel URL to /videos page
       let fetchUrl = channelUrl;
       if (!channelUrl.includes('/videos')) {
@@ -364,92 +366,132 @@ const YouTubePlaylistParser = {
       }
       
       console.log('Fetching channel videos from:', fetchUrl);
+      console.log('Max videos:', maxVideos, 'Continuation:', enableContinuation);
       
       // Fetch channel videos page
       const response = await fetch(fetchUrl);
       const html = await response.text();
       
-      // Extract video IDs from ytInitialData
-      const match = html.match(/var ytInitialData = ({.*?});/);
-      if (!match) {
+      // Extract ytInitialData and API key
+      const dataMatch = html.match(/var ytInitialData = ({.*?});/);
+      const apiKeyMatch = html.match(/"INNERTUBE_API_KEY":"([^"]+)"/);
+      
+      if (!dataMatch) {
         throw new Error('Could not parse channel data');
       }
       
-      const data = JSON.parse(match[1]);
+      const data = JSON.parse(dataMatch[1]);
+      const apiKey = apiKeyMatch ? apiKeyMatch[1] : 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
+      
       const videos = [];
+      const videoIds = new Set();
+      let continuation = null;
       
-      // Method 1: Try twoColumnBrowseResultsRenderer (most common)
-      const tabs = data?.contents?.twoColumnBrowseResultsRenderer?.tabs || [];
-      
-      for (const tab of tabs) {
-        // Rich grid (newer layout)
-        const richGrid = tab?.tabRenderer?.content?.richGridRenderer?.contents || [];
-        for (const item of richGrid) {
+      // Helper function to extract videos from content items
+      const extractVideos = (contents) => {
+        let count = 0;
+        for (const item of contents || []) {
+          // Rich grid items (newer layout)
           if (item.richItemRenderer?.content?.videoRenderer) {
             const videoId = item.richItemRenderer.content.videoRenderer.videoId;
-            if (videoId) {
+            if (videoId && !videoIds.has(videoId)) {
+              videoIds.add(videoId);
               videos.push(`https://www.youtube.com/watch?v=${videoId}`);
+              count++;
             }
           }
+          // Grid video renderer
+          else if (item.gridVideoRenderer) {
+            const videoId = item.gridVideoRenderer.videoId;
+            if (videoId && !videoIds.has(videoId)) {
+              videoIds.add(videoId);
+              videos.push(`https://www.youtube.com/watch?v=${videoId}`);
+              count++;
+            }
+          }
+          // Section list with grid
+          else if (item.itemSectionRenderer?.contents) {
+            count += extractVideos(item.itemSectionRenderer.contents);
+          }
+          // Grid renderer with nested videos
+          else if (item.gridRenderer?.items) {
+            count += extractVideos(item.gridRenderer.items);
+          }
+          // Continuation token
+          else if (item.continuationItemRenderer) {
+            continuation = item.continuationItemRenderer.continuationEndpoint?.continuationCommand?.token;
+          }
         }
+        return count;
+      };
+      
+      // Extract initial videos
+      const tabs = data?.contents?.twoColumnBrowseResultsRenderer?.tabs || [];
+      for (const tab of tabs) {
+        const richGrid = tab?.tabRenderer?.content?.richGridRenderer?.contents || [];
+        extractVideos(richGrid);
         
-        // Section list (older layout)
         const sectionList = tab?.tabRenderer?.content?.sectionListRenderer?.contents || [];
-        for (const section of sectionList) {
-          if (section.itemSectionRenderer?.contents) {
-            for (const item of section.itemSectionRenderer.contents) {
-              // Grid video renderer
-              if (item.gridVideoRenderer) {
-                const videoId = item.gridVideoRenderer.videoId;
-                if (videoId) {
-                  videos.push(`https://www.youtube.com/watch?v=${videoId}`);
-                }
-              }
-              // Grid renderer with nested videos
-              else if (item.gridRenderer?.items) {
-                for (const gridItem of item.gridRenderer.items) {
-                  if (gridItem.gridVideoRenderer) {
-                    const videoId = gridItem.gridVideoRenderer.videoId;
-                    if (videoId) {
-                      videos.push(`https://www.youtube.com/watch?v=${videoId}`);
-                    }
+        extractVideos(sectionList);
+        
+        if (videos.length > 0) break;
+      }
+      
+      console.log(`Initial fetch: ${videos.length} videos, continuation: ${!!continuation}`);
+      
+      // Fetch more videos using continuation if enabled and available
+      if (enableContinuation && continuation && videos.length < maxVideos) {
+        let attempts = 0;
+        const maxAttempts = 50; // Prevent infinite loops
+        
+        while (continuation && videos.length < maxVideos && attempts < maxAttempts) {
+          attempts++;
+          console.log(`Continuation #${attempts}: fetching more videos... (total: ${videos.length})`);
+          
+          try {
+            const browseUrl = `https://www.youtube.com/youtubei/v1/browse?key=${apiKey}`;
+            const browseResponse = await fetch(browseUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                context: {
+                  client: {
+                    clientName: 'WEB',
+                    clientVersion: '2.20231101.00.00'
                   }
-                }
-              }
+                },
+                continuation
+              })
+            });
+            
+            const browseData = await browseResponse.json();
+            continuation = null; // Reset continuation
+            
+            // Extract videos from continuation response
+            const actions = browseData?.onResponseReceivedActions || [];
+            for (const action of actions) {
+              const items = action?.appendContinuationItemsAction?.continuationItems || [];
+              extractVideos(items);
             }
+            
+            // Small delay to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+          } catch (error) {
+            console.error('Continuation error:', error);
+            break; // Stop on error
           }
         }
         
-        if (videos.length > 0) break; // Found videos, stop searching tabs
+        console.log(`Finished: ${videos.length} videos after ${attempts} continuations`);
       }
-      
-      // Method 2: If no videos found, try to extract from any videoRenderer in the entire data
-      if (videos.length === 0) {
-        console.log('No videos found in standard paths, trying deep search...');
-        const jsonStr = JSON.stringify(data);
-        const videoIdMatches = jsonStr.match(/"videoId":"([a-zA-Z0-9_-]{11})"/g);
-        
-        if (videoIdMatches) {
-          const uniqueIds = new Set();
-          for (const match of videoIdMatches) {
-            const videoId = match.match(/"videoId":"([a-zA-Z0-9_-]{11})"/)[1];
-            // Validate it's a real video ID (11 chars, alphanumeric + - and _)
-            if (videoId && videoId.length === 11 && !uniqueIds.has(videoId)) {
-              uniqueIds.add(videoId);
-              videos.push(`https://www.youtube.com/watch?v=${videoId}`);
-            }
-          }
-        }
-      }
-      
-      console.log(`Found ${videos.length} videos from channel`);
       
       if (videos.length === 0) {
         throw new Error('No videos found on channel');
       }
       
-      // Import ALL videos (no limit for paid users)
-      // If you want to limit, change this value or add to settings
       return videos;
       
     } catch (error) {
