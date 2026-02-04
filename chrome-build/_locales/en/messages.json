@@ -105,7 +105,13 @@
     "message": "Delete Selected"
   },
   "confirmDelete": {
-    "message": "Delete $COUNT$ source(s)? This cannot be undone."
+    "message": "Delete sources? This cannot be undone.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
   },
   "deleting": {
     "message": "Deleting..."
