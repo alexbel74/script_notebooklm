@@ -357,6 +357,8 @@ const YouTubePlaylistParser = {
         fetchUrl = channelUrl.replace(/\/$/, '') + '/videos';
       }
       
+      console.log('Fetching channel videos from:', fetchUrl);
+      
       // Fetch channel videos page
       const response = await fetch(fetchUrl);
       const html = await response.text();
@@ -370,36 +372,74 @@ const YouTubePlaylistParser = {
       const data = JSON.parse(match[1]);
       const videos = [];
       
-      // Navigate to channel video contents
-      // Try different possible paths in YouTube's data structure
+      // Method 1: Try twoColumnBrowseResultsRenderer (most common)
       const tabs = data?.contents?.twoColumnBrowseResultsRenderer?.tabs || [];
       
       for (const tab of tabs) {
-        const contents = tab?.tabRenderer?.content?.richGridRenderer?.contents || 
-                        tab?.tabRenderer?.content?.sectionListRenderer?.contents || [];
-        
-        for (const item of contents) {
-          // Rich grid items (newer layout)
+        // Rich grid (newer layout)
+        const richGrid = tab?.tabRenderer?.content?.richGridRenderer?.contents || [];
+        for (const item of richGrid) {
           if (item.richItemRenderer?.content?.videoRenderer) {
             const videoId = item.richItemRenderer.content.videoRenderer.videoId;
             if (videoId) {
               videos.push(`https://www.youtube.com/watch?v=${videoId}`);
             }
           }
-          // Section list items (older layout)
-          else if (item.itemSectionRenderer?.contents) {
-            for (const subItem of item.itemSectionRenderer.contents) {
-              if (subItem.gridVideoRenderer) {
-                const videoId = subItem.gridVideoRenderer.videoId;
+        }
+        
+        // Section list (older layout)
+        const sectionList = tab?.tabRenderer?.content?.sectionListRenderer?.contents || [];
+        for (const section of sectionList) {
+          if (section.itemSectionRenderer?.contents) {
+            for (const item of section.itemSectionRenderer.contents) {
+              // Grid video renderer
+              if (item.gridVideoRenderer) {
+                const videoId = item.gridVideoRenderer.videoId;
                 if (videoId) {
                   videos.push(`https://www.youtube.com/watch?v=${videoId}`);
+                }
+              }
+              // Grid renderer with nested videos
+              else if (item.gridRenderer?.items) {
+                for (const gridItem of item.gridRenderer.items) {
+                  if (gridItem.gridVideoRenderer) {
+                    const videoId = gridItem.gridVideoRenderer.videoId;
+                    if (videoId) {
+                      videos.push(`https://www.youtube.com/watch?v=${videoId}`);
+                    }
+                  }
                 }
               }
             }
           }
         }
         
-        if (videos.length > 0) break; // Found videos, stop searching
+        if (videos.length > 0) break; // Found videos, stop searching tabs
+      }
+      
+      // Method 2: If no videos found, try to extract from any videoRenderer in the entire data
+      if (videos.length === 0) {
+        console.log('No videos found in standard paths, trying deep search...');
+        const jsonStr = JSON.stringify(data);
+        const videoIdMatches = jsonStr.match(/"videoId":"([a-zA-Z0-9_-]{11})"/g);
+        
+        if (videoIdMatches) {
+          const uniqueIds = new Set();
+          for (const match of videoIdMatches) {
+            const videoId = match.match(/"videoId":"([a-zA-Z0-9_-]{11})"/)[1];
+            // Validate it's a real video ID (11 chars, alphanumeric + - and _)
+            if (videoId && videoId.length === 11 && !uniqueIds.has(videoId)) {
+              uniqueIds.add(videoId);
+              videos.push(`https://www.youtube.com/watch?v=${videoId}`);
+            }
+          }
+        }
+      }
+      
+      console.log(`Found ${videos.length} videos from channel`);
+      
+      if (videos.length === 0) {
+        throw new Error('No videos found on channel');
       }
       
       // Limit to 100 videos (configurable for paid users)
